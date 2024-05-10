@@ -4,8 +4,14 @@ Tensor::Tensor(std::initializer_list<int> shape, std::vector<float> data, bool r
 : shape(shape), require_grad(require_grad) {
     // Calculate the total size of the tensor
     int size = 1;
-    for (int dim : shape) {
-        size *= dim;
+    // If the shape is empty, size is 1
+    if (shape.size()==0) {
+        size = 1;
+    }
+    else {
+        for (int dim : shape) {
+            size *= dim;
+        }
     }
     // If the data is not provided, initialize it with zeros
     if (data.size() == 0) {
@@ -13,7 +19,7 @@ Tensor::Tensor(std::initializer_list<int> shape, std::vector<float> data, bool r
     }
     // If the data is provided, check if the size matches the tensor size
     else if (data.size() != size) {
-        throw std::invalid_argument("Data size does not match the tensor size");
+        throw std::invalid_argument("Data size does not match the tensor size. Data size: " + std::to_string(data.size()) + ", Tensor size: " + std::to_string(size));
     }
     else {
         this->data = data;
