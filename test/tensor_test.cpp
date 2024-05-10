@@ -55,7 +55,7 @@ TEST(Tensor_equality, equal) {
     bool require_grad = true;
     Tensor tensor1(shape, data, require_grad);
     Tensor tensor2(shape, data, require_grad);
-    EXPECT_EQ(tensor1, tensor2);
+    EXPECT_TRUE(tensor1==tensor2);
 }
 
 TEST(Tensor_equality, not_equal) {
@@ -67,7 +67,7 @@ TEST(Tensor_equality, not_equal) {
     bool require_grad = true;
     Tensor tensor1(shape, data1, require_grad);
     Tensor tensor2(shape, data2, require_grad);
-    EXPECT_NE(tensor1, tensor2);
+    EXPECT_TRUE(tensor1!=tensor2);
 }
 
 // TEST(Tensor_indexing, indexing) {
