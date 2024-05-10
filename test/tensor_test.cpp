@@ -47,6 +47,14 @@ TEST(Tensor_Init, zero_shape) {
     EXPECT_EQ(tensor.numel(), 1);
 }
 
+TEST(Tensor_Init, non_zero_shape) {
+    std::initializer_list<int> shape = {1, 2};
+    std::vector<float> data = {10, 20};
+    bool require_grad = true;
+    Tensor tensor(shape, data, require_grad);
+    EXPECT_EQ(tensor.numel(), 2);
+}
+
 TEST(Tensor_number_of_element, numel) {
     std::initializer_list<int> shape = {3, 2, 4};
     std::vector<float> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
