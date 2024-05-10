@@ -19,16 +19,15 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-  neuralnet_test
-  neuralnet_test.cpp
-  neuralnet.cpp
-  neuralnet.h
+  tensor_test
+  tensor.cpp
+  test/tensor_test.cpp
 )
 
 target_link_libraries(
-  neuralnet_test
+  tensor_test
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(neuralnet_test)
+gtest_discover_tests(tensor_test)
