@@ -3,12 +3,11 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <initializer_list>
 
 
 class Tensor {
 public:
-    Tensor(std::initializer_list<int> shape, std::vector<float> data = std::vector<float>(), bool require_grad = false);
+    Tensor(std::vector<int> shape, std::vector<float> data = std::vector<float>(), bool require_grad = false);
     
     std::vector<float> data;
     std::vector<int> shape;

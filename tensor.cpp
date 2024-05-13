@@ -1,6 +1,6 @@
 #include "include/tensor.h"
 
-Tensor::Tensor(std::initializer_list<int> shape, std::vector<float> data, bool require_grad) 
+Tensor::Tensor(std::vector<int> shape, std::vector<float> data, bool require_grad) 
 : shape(shape), require_grad(require_grad) {
     // Calculate the total size of the tensor
     int size = 1;
@@ -54,11 +54,24 @@ bool operator!=(Tensor tensor1, Tensor tensor2) {
     return false;
 }
 
-// Tensor Tensor::operator[](int index) {
-//     std::vector<int> new_shape(shape.begin() + 1, shape.end());
-//     std::vector<float> new_data(data.begin() + index * new_shape[0], data.begin() + (index + 1) * new_shape[0]);
-//     return Tensor(new_shape, new_data, require_grad);
-// }
+Tensor Tensor::operator[](int index) {
+    // Calculate the new shape of the return tensor
+    if (shape.size() == 0) {
+        throw std::invalid_argument("Cannot index a zero-dim tensor");
+    }
+    // New shape is the last n-1 dimensions of the current shape
+    std::vector<int> new_shape(shape.begin() + 1, shape.end());
+    // Calculate the size of the new tensor
+    int new_size = 1;
+    for (int dim : new_shape) {
+        new_size *= dim;
+    }
+    // Calculate the start and end index of the data
+    int start = index * new_size;
+    int end = start + new_size;
+    // Return the new tensor
+    return Tensor(new_shape, std::vector<float>(data.begin() + start, data.begin() + end), require_grad);
+}
 
 
 // // Initialize the Linear Layer

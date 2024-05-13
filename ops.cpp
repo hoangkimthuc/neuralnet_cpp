@@ -3,7 +3,7 @@
 
 // Initialize the Linear Layer
 Linear::Linear(int in_features, int out_features) {
-    std::initializer_list<int> shape_w = {in_features, out_features};
+    std::vector<int> shape_w = {in_features, out_features};
     std::vector<float> data_w;
     std::default_random_engine generator;
     std::normal_distribution<float> distribution(0.0, 1);
