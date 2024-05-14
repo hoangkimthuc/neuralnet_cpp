@@ -78,60 +78,6 @@ Tensor Tensor::operator[](int index) {
     // Return the new tensor
     return Tensor(new_shape, std::vector<float>(data.begin() + start, data.begin() + end), require_grad);
 }
-
-
-// // Initialize the Linear Layer
-// Linear::Linear(int in_features, int out_features) {
-//     std::initializer_list<int> shape_w = {in_features, out_features};
-//     std::vector<float> data_w;
-//     std::default_random_engine generator;
-//     std::normal_distribution<float> distribution(0.0, 1);
-//     // Initialize weights and biases with random values from a normal distribution with mean 0 and standard deviation 1
-//     for (int i = 0; i < in_features; i++) {
-//         for (int j = 0; j < out_features; j++) {
-//             data_w.push_back(distribution(generator));
-//         }
-//     }
-//     weights = Tensor(shape_w, data_w, true);
-
-//     std::initializer_list<int> shape_b = {out_features};
-//     std::vector<float> data_b;
-//     for (int i = 0; i < out_features; i++) {        
-//         data_w.push_back(distribution(generator));
-//     }
-//     bias = Tensor(shape_b, data_b, true);
-
-//     // Initialize the gradients with zeros
-//     grad_weights = Tensor(shape_w, std::vector<float>(shape_w.size(), 0), false);
-//     grad_bias = Tensor(shape_b, std::vector<float>(shape_b.size(), 0), false);
-
-//     // Fix the grad_fn name
-//     grad_fn = "Linear_backward";
-// }
-
-// // Implement the forward pass of the Linear layer
-// Tensor Linear::forward(const Tensor& x) {
-//     int batch_size = x.shape[0];
-//     int in_features = x.shape[1];
-//     int out_features = bias.size();
-    
-//     bool output_require_grad = x.require_grad || weights.require_grad || bias.require_grad;
-//     // Initialize the output tensor
-//     Tensor output({batch_size, out_features}, std::vector<float>(), output_require_grad);
-    
-//     // Perform the matrix multiplication
-//     for (int b = 0; b < batch_size; b++) {
-//         for (int j = 0; j < out_features; j++) {
-//             output.data[b * out_features + j] = bias[j];
-//             for (int i = 0; i < in_features; i++) {
-//                 output.data[b * out_features + j] += x.data[b * in_features + i] * weights[i][j];
-//             }
-//         }
-//     }
-    
-//     return output;
-// }
-
 // // Implement the backward pass of the Linear layer
 // std::vector<std::vector<float>> Linear::backward(std::vector<std::vector<float>> grad_output) {
 //     int batch_size = grad_output.size();
