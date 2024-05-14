@@ -1,5 +1,11 @@
 #include "include/tensor.h"
 
+Tensor::Tensor() {
+    shape = std::vector<int>();
+    data = std::vector<float>();
+    require_grad = false;
+}
+
 Tensor::Tensor(std::vector<int> shape, std::vector<float> data, bool require_grad) 
 : shape(shape), require_grad(require_grad) {
     // Calculate the total size of the tensor

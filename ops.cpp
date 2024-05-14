@@ -2,7 +2,8 @@
 #include <random>
 
 // Initialize the Linear Layer
-Linear::Linear(int in_features, int out_features) {
+Linear::Linear(int in_features, int out_features)
+    {
     std::vector<int> shape_w = {in_features, out_features};
     std::vector<float> data_w;
     std::default_random_engine generator;
@@ -15,16 +16,16 @@ Linear::Linear(int in_features, int out_features) {
     }
     weights = Tensor(shape_w, data_w, true);
 
-    std::initializer_list<int> shape_b = {out_features};
+    std::vector<int> shape_b = {out_features};
     std::vector<float> data_b;
     for (int i = 0; i < out_features; i++) {        
-        data_w.push_back(distribution(generator));
+        data_b.push_back(distribution(generator));
     }
     bias = Tensor(shape_b, data_b, true);
 
     // Initialize the gradients with zeros
-    grad_weights = Tensor(shape_w, std::vector<float>(shape_w.size(), 0), false);
-    grad_bias = Tensor(shape_b, std::vector<float>(shape_b.size(), 0), false);
+    grad_weights = Tensor(shape_w, std::vector<float>(data_w.size(), 0), false);
+    grad_bias = Tensor(shape_b, std::vector<float>(data_b.size(), 0), false);
 
     // Fix the grad_fn name
     grad_fn = "Linear_backward";

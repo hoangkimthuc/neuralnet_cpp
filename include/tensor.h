@@ -7,8 +7,8 @@
 
 class Tensor {
 public:
+    Tensor();
     Tensor(std::vector<int> shape, std::vector<float> data = std::vector<float>(), bool require_grad = false);
-    
     std::vector<float> data;
     std::vector<int> shape;
     bool require_grad;

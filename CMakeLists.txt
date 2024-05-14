@@ -24,8 +24,19 @@ add_executable(
   test/tensor_test.cpp
 )
 
+add_executable(
+  ops_test
+  ops.cpp
+  tensor.cpp
+  test/ops_test.cpp
+)
+
 target_link_libraries(
   tensor_test
+  GTest::gtest_main
+)
+target_link_libraries(
+  ops_test
   GTest::gtest_main
 )
 
