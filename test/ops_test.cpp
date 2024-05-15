@@ -27,4 +27,15 @@ TEST(Linear_forward, shape_checking_pass)
     std::vector<int> expected_shape = {2, 2};
     EXPECT_EQ(output.shape, expected_shape);
 }
+
+TEST(Linear_forward, output_values)
+{
+    Linear linear(2, 2);
+    linear.weights.data = std::vector<float>{1, 2, 3, 4};
+    linear.bias.data = std::vector<float>{1, 1};
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    Tensor output = linear.forward(input);
+    std::vector<float> expected_output = std::vector<float>{5, 7, 5, 7};
+    EXPECT_EQ(output.data, expected_output);
+}
     

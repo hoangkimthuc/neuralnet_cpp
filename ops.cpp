@@ -57,6 +57,7 @@ Tensor Linear::forward(const Tensor& x) {
         }
     }
     
+    
     return output;
 }
 
