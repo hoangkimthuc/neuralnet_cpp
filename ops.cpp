@@ -33,9 +33,12 @@ Linear::Linear(int in_features, int out_features)
 
 // Implement the forward pass of the Linear layer
 Tensor Linear::forward(const Tensor& x) {
+    // Set the input tensor when the forward pass is called for later grad computation
+    this->input = x;
+
     int batch_size = x.shape[0];
     int in_features = x.shape[1];
-    int out_features = bias.numel();
+    int out_features = weights.shape[1];
     
     // First check if the shape is correct
     if (in_features != weights.shape[0]) {
@@ -49,15 +52,59 @@ Tensor Linear::forward(const Tensor& x) {
     
     // Perform the matrix multiplication
     for (int b = 0; b < batch_size; b++) {
-        for (int j = 0; j < out_features; j++) {
+        for (int o = 0; o < out_features; o++) {
             for (int i = 0; i < in_features; i++) {
-                output.data[b * out_features + j] += x.data[b * in_features + i] * weights.data[i * out_features + j];
+                output.data[b * out_features + o] += x.data[b * in_features + i] * weights.data[i * out_features + o];
             }
-            output.data[b * out_features + j] += bias.data[j];
+            output.data[b * out_features + o] += bias.data[o];
         }
     }
-    
     
     return output;
 }
 
+// Implement the backward pass of the Linear layer
+void Linear::backward(const Tensor& grad_output) {
+    // Check the shape of grad_output
+    if (grad_output.shape[1] != weights.shape[1]) {
+        throw std::invalid_argument("The number of output features should be equal to the number of weights. Got out features:" + std::to_string(grad_output.shape[1]) + " and number of weights: " + std::to_string(weights.shape[1]) + " instead.");
+    }
+    if (grad_output.shape[0] != input.shape[0]) {
+        throw std::invalid_argument("The batch size of the input and the gradient of the output should be the same. Got batch size of input:" + std::to_string(input.shape[0]) + " and batch size of grad_output: " + std::to_string(grad_output.shape[0]) + " instead.");
+    }
+    
+    // Compute gradients with respect to weights and biases
+    int batch_size = grad_output.shape[0];
+    int in_features = weights.shape[0];
+    int out_features = weights.shape[1];
+
+    // Initialize the gradients with zeros
+    grad_weights = Tensor(weights.shape, std::vector<float>(weights.numel(), 0), false);
+    grad_bias = Tensor(bias.shape, std::vector<float>(bias.numel(), 0), false);
+    grad_input = Tensor(input.shape, std::vector<float>(input.numel(), 0), false);
+
+    // Compute the gradients for the input if require_grad is set to true
+    if (input.require_grad) {
+        for (int b = 0; b < batch_size; b++) {
+            for (int i = 0; i < in_features; i++) {
+                for (int o = 0; o < out_features; o++) {
+                    grad_input.data[b * in_features + i] += grad_output.data[b * out_features + o] * weights.data[i * out_features + o];
+                }
+            }
+        }
+    }
+    // Compute the gradients for weights if require_grad is set to true
+    if (weights.require_grad) {
+        for (int i = 0; i < in_features; i++) {
+            for (int o = 0; o < out_features; o++) {
+                for (int b = 0; b < batch_size; b++) {
+                    grad_weights.data[i * out_features + o] += input.data[b * in_features + i] * grad_output.data[b * out_features + o];
+                }
+            }
+        }
+    }
+    // Compute the gradients for bias if require_grad is set to true
+    if (bias.require_grad) {
+        grad_bias = grad_output;
+    }
+}

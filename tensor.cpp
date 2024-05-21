@@ -75,47 +75,6 @@ Tensor Tensor::operator[](int index) {
     // Calculate the start and end index of the data
     int start = index * new_size;
     int end = start + new_size;
-    // Return the new tensor
+    
     return Tensor(new_shape, std::vector<float>(data.begin() + start, data.begin() + end), require_grad);
 }
-// // Implement the backward pass of the Linear layer
-// std::vector<std::vector<float>> Linear::backward(std::vector<std::vector<float>> grad_output) {
-//     int batch_size = grad_output.size();
-//     int out_features = grad_output[0].size();
-//     int in_features = input[0].size();
-    
-//     // Compute gradients w.r.t. weights and biases
-//     for (int i = 0; i < in_features; i++) {
-//         for (int j = 0; j < out_features; j++) {
-//             grad_weights[i][j] = 0;
-//             for (int b = 0; b < batch_size; b++) {
-//                 grad_weights[i][j] += input[b][i] * grad_output[b][j];
-//             }
-//             grad_weights[i][j] /= batch_size;
-//         }
-//     }
-    
-//     for (int j = 0; j < out_features; j++) {
-//         grad_bias[j] = 0;
-//         for (int b = 0; b < batch_size; b++) {
-//             grad_bias[j] += grad_output[b][j];
-//         }
-//         grad_bias[j] /= batch_size;
-//     }
-    
-//     // Compute gradients w.r.t. input
-//     std::vector<std::vector<float>> grad_input;
-//     for (int b = 0; b < batch_size; b++) {
-//         std::vector<float> grad_input_b;
-//         for (int i = 0; i < in_features; i++) {
-//             float sum = 0;
-//             for (int j = 0; j < out_features; j++) {
-//                 sum += grad_output[b][j] * weights[i][j];
-//             }
-//             grad_input_b.push_back(sum);
-//         }
-//         grad_input.push_back(grad_input_b);
-//     }
-    
-//     return grad_input;
-// }

@@ -38,4 +38,27 @@ TEST(Linear_forward, output_values)
     std::vector<float> expected_output = std::vector<float>{5, 7, 5, 7};
     EXPECT_EQ(output.data, expected_output);
 }
+
+TEST(Linear_backward, grad_values)
+{
+    Linear linear(2, 3);
+    Tensor input(std::vector<int>{3,2}, std::vector<float>{7.0, 8.0, 9.0, 10.0, 11.0, 12.0}, true);
+    Tensor linear_weights(std::vector<int>{2,3}, std::vector<float>{1.0, 2.0, 3.0, 4.0, 5.0, 6.0}, true);
+    linear.weights = linear_weights;
+    Tensor linear_bias(std::vector<int>{3}, std::vector<float>{1.0, 1.0, 1.0}, true);
+    linear.bias = linear_bias;
+    Tensor output = linear.forward(input);
+    Tensor grad_output(std::vector<int>{3,3}, std::vector<float>{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}, false);
+    linear.backward(grad_output);
+    std::vector<float> expected_weights_grad_data = std::vector<float>{120.0, 147.0, 174.0, 132.0, 162.0, 192.0};
+    std::vector<int> expected_weights_grad_shape = std::vector<int>{2, 3};
+    Tensor expected_grad_weights(expected_weights_grad_shape, expected_weights_grad_data, false);
+    EXPECT_EQ(linear.grad_weights, expected_grad_weights);
+    EXPECT_EQ(linear.grad_bias, grad_output);
+
+    std::vector<float> expected_input_grad_data = std::vector<float>{14, 32, 32, 77, 50, 122};
+    std::vector<int> expected_input_grad_shape = std::vector<int>{3, 2};
+    Tensor expected_input_grad(expected_input_grad_shape, expected_input_grad_data, false);
+    EXPECT_EQ(linear.grad_input, expected_input_grad);
     
+}
