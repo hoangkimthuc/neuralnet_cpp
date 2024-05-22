@@ -108,3 +108,38 @@ void Linear::backward(const Tensor& grad_output) {
         grad_bias = grad_output;
     }
 }
+
+// Implement the forward pass of the Sum layer
+Tensor Sum::forward(const Tensor& x) {
+    // Set the input tensor when the forward pass is called for later grad computation
+    this->input = x;
+    bool output_require_grad = x.require_grad;
+
+    // Initialize the output tensor
+    std::vector<int> output_shape = {1};
+    std::vector<float> output_data(1, 0);
+    Tensor output(output_shape, output_data, output_require_grad);
+    
+    // Perform the sum operation
+    for (int i = 0; i < x.numel(); i++) {
+        output.data[0] += x.data[i];
+    }
+    // Set the grad_fn name
+    this->grad_fn = "Sum_backward";
+    return output;
+}
+
+// Implement the backward pass of the Sum layer
+void Sum::backward(const Tensor& grad_output) {
+    // Check if the shape of the grad_output is correct
+    if (grad_output.numel() != 1) {
+        throw std::invalid_argument("The gradient of the output should be a scalar. Got shape:" + std::to_string(grad_output.numel()) + " instead.");
+    }
+    // Compute the gradients for the input if require_grad is set to true
+    if (input.require_grad) {
+        grad_input = Tensor(input.shape, std::vector<float>(input.numel(), 0), false);
+        for (int i = 0; i < input.numel(); i++) {
+            grad_input.data[i] = grad_output.data[0];
+        }
+    }
+}

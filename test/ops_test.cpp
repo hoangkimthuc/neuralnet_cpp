@@ -62,3 +62,23 @@ TEST(Linear_backward, grad_values)
     EXPECT_EQ(linear.grad_input, expected_input_grad);
     
 }
+
+TEST(Sum_forward, forward_pass)
+{
+    Sum sum;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    Tensor output = sum.forward(input);
+    Tensor expected_output(std::vector<int>{1}, std::vector<float>{4}, false);
+    EXPECT_EQ(output, expected_output);
+}
+
+TEST(Sum_backward, backward_pass)
+{
+    Sum sum;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, true);
+    Tensor grad_output(std::vector<int>{1}, std::vector<float>{1.0}, false);
+    sum.forward(input);
+    sum.backward(grad_output);
+    Tensor expected_grad_input(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    EXPECT_EQ(sum.grad_input, expected_grad_input);
+}

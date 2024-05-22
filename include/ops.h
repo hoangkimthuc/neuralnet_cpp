@@ -18,3 +18,12 @@ public:
     std::string grad_fn;
     
 };
+
+class Sum {
+public:
+    Tensor forward(const Tensor& input);
+    void backward(const Tensor& grad_output);
+    Tensor input;
+    Tensor grad_input;
+    std::string grad_fn;
+};
