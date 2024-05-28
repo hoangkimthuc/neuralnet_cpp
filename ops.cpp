@@ -24,8 +24,8 @@ Linear::Linear(int in_features, int out_features)
     bias = Tensor(shape_b, data_b, true);
 
     // Initialize the gradients with zeros
-    grad_weights = Tensor(shape_w, std::vector<float>(data_w.size(), 0), false);
-    grad_bias = Tensor(shape_b, std::vector<float>(data_b.size(), 0), false);
+    weights.grad = std::vector<float>(data_w.size(), 0);
+    bias.grad = std::vector<float>(data_b.size(), 0);
 
     // Fix the grad_fn name
     grad_fn = "Linear_backward";
@@ -78,17 +78,17 @@ void Linear::backward(const Tensor& grad_output) {
     int in_features = weights.shape[0];
     int out_features = weights.shape[1];
 
-    // Initialize the gradients with zeros
-    grad_weights = Tensor(weights.shape, std::vector<float>(weights.numel(), 0), false);
-    grad_bias = Tensor(bias.shape, std::vector<float>(bias.numel(), 0), false);
-    grad_input = Tensor(input.shape, std::vector<float>(input.numel(), 0), false);
-
+    // Initialize the gradients with zeros    
+    input.grad = std::vector<float>(input.numel(), 0);
+    weights.grad = std::vector<float>(weights.numel(), 0);
+    bias.grad = std::vector<float>(bias.numel(), 0);
+    
     // Compute the gradients for the input if require_grad is set to true
     if (input.require_grad) {
         for (int b = 0; b < batch_size; b++) {
             for (int i = 0; i < in_features; i++) {
                 for (int o = 0; o < out_features; o++) {
-                    grad_input.data[b * in_features + i] += grad_output.data[b * out_features + o] * weights.data[i * out_features + o];
+                    input.grad[b * in_features + i] += grad_output.data[b * out_features + o] * weights.data[i * out_features + o];
                 }
             }
         }
@@ -98,14 +98,14 @@ void Linear::backward(const Tensor& grad_output) {
         for (int i = 0; i < in_features; i++) {
             for (int o = 0; o < out_features; o++) {
                 for (int b = 0; b < batch_size; b++) {
-                    grad_weights.data[i * out_features + o] += input.data[b * in_features + i] * grad_output.data[b * out_features + o];
+                    weights.grad[i * out_features + o] += input.data[b * in_features + i] * grad_output.data[b * out_features + o];
                 }
             }
         }
     }
     // Compute the gradients for bias if require_grad is set to true
     if (bias.require_grad) {
-        grad_bias = grad_output;
+        bias.grad = grad_output.data;
     }
 }
 
@@ -135,11 +135,11 @@ void Sum::backward(const Tensor& grad_output) {
     if (grad_output.numel() != 1) {
         throw std::invalid_argument("The gradient of the output should be a scalar. Got shape:" + std::to_string(grad_output.numel()) + " instead.");
     }
+    
+    // Initialize the gradients with zeros
+    input.grad = std::vector<float>(input.numel(), 0);
     // Compute the gradients for the input if require_grad is set to true
     if (input.require_grad) {
-        grad_input = Tensor(input.shape, std::vector<float>(input.numel(), 0), false);
-        for (int i = 0; i < input.numel(); i++) {
-            grad_input.data[i] = grad_output.data[0];
-        }
+        input.grad = std::vector<float>(input.numel(), grad_output.data[0]);
     }
 }

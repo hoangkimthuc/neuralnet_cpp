@@ -1,6 +1,8 @@
 #pragma once
 
 #include "tensor.h"
+#include <string>
+
 // Define the neural Linear layer
 class Linear {
 public:
@@ -12,9 +14,6 @@ public:
     Tensor input;
     Tensor weights;
     Tensor bias;
-    Tensor grad_input;
-    Tensor grad_weights;
-    Tensor grad_bias;
     std::string grad_fn;
     
 };
@@ -24,6 +23,5 @@ public:
     Tensor forward(const Tensor& input);
     void backward(const Tensor& grad_output);
     Tensor input;
-    Tensor grad_input;
     std::string grad_fn;
 };
