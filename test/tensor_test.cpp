@@ -122,3 +122,16 @@ TEST(Tensor_indexing, indexing) {
     std::vector<int> shape_last_row = {4};
     std::vector<float> data_last_row = {21, 22, 23, 24};
 }
+
+TEST(Tensor_grad, pass) {
+    std::vector<int> shape = {3, 2, 4};
+    std::vector<float> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                               13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+    bool require_grad = true;
+    Tensor tensor(shape, data, require_grad);
+    tensor.grad = std::vector<float>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+    std::vector<float> expected_grad = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+    EXPECT_EQ(tensor.grad, expected_grad);
+}
