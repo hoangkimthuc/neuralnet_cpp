@@ -31,13 +31,13 @@ add_executable(
   test/ops_test.cpp
 )
 
-# add_executable(
-#   autograd_test
-#   autograd.cpp
-#   tensor.cpp
-#   ops.cpp
-#   test/autograd_test.cpp
-# )
+add_executable(
+  autograd_test
+  autograd.cpp
+  tensor.cpp
+  ops.cpp
+  test/autograd_test.cpp
+)
 
 target_link_libraries(
   tensor_test
@@ -47,10 +47,10 @@ target_link_libraries(
   ops_test
   GTest::gtest_main
 )
-# target_link_libraries(
-#   autograd_test
-#   GTest::gtest_main
-# )
+target_link_libraries(
+  autograd_test
+  GTest::gtest_main
+)
 
 include(GoogleTest)
 gtest_discover_tests(tensor_test)

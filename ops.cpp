@@ -1,5 +1,6 @@
 #include "include/ops.h"
 #include <random>
+#include <iostream>
 
 // Initialize the Linear Layer
 Linear::Linear(int in_features, int out_features)
@@ -66,6 +67,7 @@ Tensor Linear::forward(const Tensor& x) {
 // Implement the backward pass of the Linear layer
 void Linear::backward(const Tensor& grad_output) {
     // Check the shape of grad_output
+    std::cout << "grad_output shape: " << grad_output.shape[0] << " " << grad_output.shape[1] << std::endl;
     if (grad_output.shape[1] != weights.shape[1]) {
         throw std::invalid_argument("The number of output features should be equal to the number of weights. Got out features:" + std::to_string(grad_output.shape[1]) + " and number of weights: " + std::to_string(weights.shape[1]) + " instead.");
     }
