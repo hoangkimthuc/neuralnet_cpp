@@ -14,7 +14,6 @@ public:
     std::vector<int> shape;
     std::vector<float> grad;
     bool require_grad;
-    std::string grad_fn;
     int numel() const;
     Tensor operator[](int index);
 };
