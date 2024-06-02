@@ -31,3 +31,20 @@ void ComputeGraph::backward() {
         }
     }   
 }
+
+void ComputeGraph::sgd_step(float lr) {
+    for (int i = 0; i < operations.size(); i++) {
+        if (auto* linear = dynamic_cast<Linear*>(operations[i])) {
+            if (linear->weights.require_grad) {
+            for (int j = 0; j < linear->weights.numel(); j++) {
+                linear->weights.data[j] -= lr * linear->weights.grad[j];
+            }
+            }
+            if (linear->bias.require_grad) {
+            for (int j = 0; j < linear->bias.numel(); j++) {
+                linear->bias.data[j] -= lr * linear->bias.grad[j];
+            }
+            }
+        }
+    }
+}
