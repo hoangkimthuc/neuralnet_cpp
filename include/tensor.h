@@ -17,7 +17,6 @@ public:
     std::string grad_fn;
     int numel() const;
     Tensor operator[](int index);
-    void backward();
 };
 
 bool operator==(Tensor t1, Tensor t2);
