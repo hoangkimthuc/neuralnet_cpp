@@ -12,7 +12,6 @@ TEST(Autograd, backward_sum) {
     Sum sum;
     Tensor input(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, true);
     Tensor output = sum.forward(input);
-    // std::cout << sum.grad_fn << std::endl;
     graph.add(&sum);
     graph.backward();
     std::vector<float> expected_grad = std::vector<float>{1.0, 1.0, 1.0, 1.0};
@@ -28,14 +27,10 @@ TEST(Autograd, backward_linear_sum) {
     Tensor linear_bias(std::vector<int>{3}, std::vector<float>{1.0, 1.0, 1.0}, true);
     linear.bias = linear_bias;
     Tensor output = linear.forward(input);
-    for (int i = 0; i < output.numel(); i++) {
-        std::cout << output.data[i] << std::endl;
-    }
     graph.add(&linear);
 
     Sum sum;
     Tensor loss = sum.forward(output);
-    std::cout << loss.data[0] << std::endl;
     graph.add(&sum);
     
     graph.backward();    
