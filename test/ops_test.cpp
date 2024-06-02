@@ -79,3 +79,32 @@ TEST(Sum_backward, backward_pass)
     std::vector<float> expected_grad = std::vector<float>{1.0, 1.0, 1.0, 1.0};
     EXPECT_EQ(sum.input.grad, expected_grad);
 }
+
+TEST(ReLU_forward, shape_checking_fail)
+{
+    ReLU relu;
+    Tensor input(std::vector<int>{1,4}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    Tensor grad_output(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    relu.forward(input);
+    EXPECT_THROW(relu.backward(grad_output), std::invalid_argument);
+}
+
+TEST(ReLU_forward, forward_pass)
+{
+    ReLU relu;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{-1.0, 1.0, 1.0, -1.0}, false);
+    Tensor output = relu.forward(input);
+    std::vector<float> expected_output = std::vector<float>{0, 1, 1, 0};
+    EXPECT_EQ(output.data, expected_output);
+}
+
+TEST(ReLU_backward, backward_pass)
+{
+    ReLU relu;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{-1.0, 1.0, 1.0, -1.0}, true);
+    Tensor grad_output(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    relu.forward(input);
+    relu.backward(grad_output);
+    std::vector<float> expected_grad = std::vector<float>{0, 1, 1, 0};
+    EXPECT_EQ(relu.input.grad, expected_grad);
+}

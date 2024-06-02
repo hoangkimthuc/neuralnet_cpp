@@ -34,3 +34,11 @@ public:
     Tensor input;
     std::string grad_fn;
 };
+
+class ReLU : public Operation{
+public:
+    Tensor forward(const Tensor& input) override;
+    void backward(const Tensor& grad_output) override;
+    Tensor input;
+    std::string grad_fn;
+};

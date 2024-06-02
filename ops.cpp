@@ -149,3 +149,41 @@ void Sum::backward(const Tensor& grad_output) {
         input.grad = std::vector<float>(input.numel(), grad_output.data[0]);
     }
 }
+
+Tensor ReLU::forward(const Tensor& x) {
+    // Set the input tensor when the forward pass is called for later grad computation
+    this->input = x;
+    bool output_require_grad = x.require_grad;
+
+    // Initialize the output tensor
+    std::vector<int> output_shape = x.shape;
+    std::vector<float> output_data(x.numel(), 0);
+    Tensor output(output_shape, output_data, output_require_grad);
+    
+    // Perform the ReLU operation
+    for (int i = 0; i < x.numel(); i++) {
+        output.data[i] = std::max(0.0f, x.data[i]);
+    }
+    // Set the grad_fn name
+    this->grad_fn = "Relu_backward";
+    return output;
+}
+
+void ReLU::backward(const Tensor& grad_output) {
+    // Check if the shape of the grad_output is correct
+    if (grad_output.numel() != input.numel()) {
+        throw std::invalid_argument("The gradient of the output should have the same shape as the input. Got shape:" + std::to_string(grad_output.numel()) + " instead.");
+    }
+    if (grad_output.shape != input.shape) {
+        throw std::invalid_argument("The gradient of the output should have the same shape as the input. Got shape:" + std::to_string(grad_output.shape[0]) + " " + std::to_string(grad_output.shape[1]) + " instead.");
+    }
+    
+    // Initialize the gradients with zeros
+    input.grad = std::vector<float>(input.numel(), 0);
+    // Compute the gradients for the input if require_grad is set to true
+    if (input.require_grad) {
+        for (int i = 0; i < input.numel(); i++) {
+            input.grad[i] = grad_output.data[i] * (input.data[i] > 0);
+        }
+    }
+}
