@@ -51,8 +51,9 @@ TEST(Linear_backward, grad_values)
     Tensor grad_output(std::vector<int>{3,3}, std::vector<float>{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}, false);
     linear.backward(grad_output);
     std::vector<float> expected_weights_grad_data = std::vector<float>{120.0, 147.0, 174.0, 132.0, 162.0, 192.0};
+    std::vector<float> expected_bias_grad_data = std::vector<float>{12, 15, 18};
     EXPECT_EQ(linear.weights.grad, expected_weights_grad_data);
-    EXPECT_EQ(linear.bias.grad, grad_output.data);
+    EXPECT_EQ(linear.bias.grad, expected_bias_grad_data);
 
     std::vector<float> expected_input_grad_data = std::vector<float>{14, 32, 32, 77, 50, 122};
     EXPECT_EQ(linear.input.grad, expected_input_grad_data);

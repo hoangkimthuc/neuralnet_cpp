@@ -107,7 +107,11 @@ void Linear::backward(const Tensor& grad_output) {
     }
     // Compute the gradients for bias if require_grad is set to true
     if (bias.require_grad) {
-        bias.grad = grad_output.data;
+        for (int b = 0; b < batch_size; b++) {
+            for (int o = 0; o < out_features; o++) {
+                bias.grad[o] += grad_output.data[b * out_features + o];
+            }
+        }
     }
 }
 

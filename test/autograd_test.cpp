@@ -42,6 +42,9 @@ TEST(ComputeGraph, backward_linear_sum) {
     std::vector<float> expected_weights_grad_data = std::vector<float>{27, 27, 27, 30, 30, 30};
     EXPECT_EQ(linear.weights.grad, expected_weights_grad_data);
 
+    std::vector<float> expected_bias_grad_data = std::vector<float>{3, 3, 3};
+    EXPECT_EQ(linear.bias.grad, expected_bias_grad_data);
+    
     std::vector<float> expected_input_grad_data = std::vector<float>{6, 15, 6, 15, 6, 15};
     EXPECT_EQ(linear.input.grad, expected_input_grad_data);
 }

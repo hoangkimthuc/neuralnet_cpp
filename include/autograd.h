@@ -12,6 +12,7 @@ class ComputeGraph {
 public:
     void add(Operation* operation);
     void backward();
+    void sgd_step(float lr);
 
 private:
     std::vector<Operation*> operations;
