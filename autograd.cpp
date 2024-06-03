@@ -13,6 +13,8 @@ void ComputeGraph::add(Operation* operation) {
 }
 
 void ComputeGraph::backward() {
+    // Print the number of operations in the graph
+    std::cout << "Number of operations in the graph: " << operations.size() << std::endl;
     // Set the gradient of the last operation to 1
     Tensor output_grad(std::vector<int>{1}, std::vector<float>{1.0}, false);
     // Traverse the graph in reverse order to perform backpropagation
@@ -24,6 +26,17 @@ void ComputeGraph::backward() {
         else if (auto* linear = dynamic_cast<Linear*>(operations[i])) {
             linear->backward(output_grad);
             output_grad = Tensor(linear->input.shape, linear->input.grad, false);
+        }
+        else if (auto* relu = dynamic_cast<ReLU*>(operations[i])) {
+            relu->backward(output_grad);
+            output_grad = Tensor(relu->input.shape, relu->input.grad, false);
+        }
+        else if (auto* cross_entropy = dynamic_cast<CrossEntropy*>(operations[i])) {
+            cross_entropy->backward(output_grad);
+            output_grad = Tensor(cross_entropy->input.shape, cross_entropy->input.grad, false);
+        }
+        else {
+            throw std::invalid_argument("Operation not supported");
         }
     }   
 }

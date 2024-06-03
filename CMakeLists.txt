@@ -38,6 +38,13 @@ add_executable(
   ops.cpp
   test/autograd_test.cpp
 )
+add_executable(
+  train
+  train.cpp
+  autograd.cpp
+  tensor.cpp
+  ops.cpp
+)
 
 target_link_libraries(
   tensor_test
