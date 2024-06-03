@@ -108,3 +108,36 @@ TEST(ReLU_backward, backward_pass)
     std::vector<float> expected_grad = std::vector<float>{0, 1, 1, 0};
     EXPECT_EQ(relu.input.grad, expected_grad);
 }
+
+TEST(CrossEntropy_forward, shape_checking_fail)
+{
+    CrossEntropy cross_entropy;
+    Tensor input(std::vector<int>{1,4}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    Tensor target(std::vector<int>{2,2}, std::vector<float>{1.0, 1.0, 1.0, 1.0}, false);
+    EXPECT_THROW(cross_entropy.forward(input, target), std::invalid_argument);
+}
+
+TEST(CrossEntropy_forward, forward_pass)
+{
+    CrossEntropy cross_entropy;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{0.1, 0.2, 0.3, 0.4}, false);
+    Tensor target(std::vector<int>{2}, std::vector<float>{1, 0}, false);
+    Tensor output = cross_entropy.forward(input, target);
+    std::vector<float> expected_output = std::vector<float>{0.6943966746330261};
+    EXPECT_EQ(output.data, expected_output);
+}
+
+TEST(CrossEntropy_backward, backward_pass)
+{
+    CrossEntropy cross_entropy;
+    Tensor input(std::vector<int>{2,2}, std::vector<float>{0.1, 0.2, 0.3, 0.4}, true);
+    Tensor target(std::vector<int>{2}, std::vector<float>{1, 0}, false);
+    Tensor output = cross_entropy.forward(input, target);
+    cross_entropy.backward(Tensor(std::vector<int>{1}, std::vector<float>{1.0}, false));
+    std::vector<float> expected_grad = std::vector<float>{0.2375, -0.2375, -0.2625,  0.2625};
+    for (int i=0; i<4; i++)
+    {
+        EXPECT_NEAR(cross_entropy.input.grad[i], expected_grad[i], 2e-5);
+    }
+
+}

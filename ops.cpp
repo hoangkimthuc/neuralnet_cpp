@@ -186,22 +186,73 @@ void ReLU::backward(const Tensor& grad_output) {
     }
 }
 
-Tensor CrossEntropy::forward(const Tensor& x, const Tensor& target) {
+Tensor CrossEntropy::forward(const Tensor& input, const Tensor& target) {
     // Set the input tensor when the forward pass is called for later grad computation
-    this->input = x;
+    this->input = input;
     this->target = target;
-    bool output_require_grad = x.require_grad;
+    bool output_require_grad = input.require_grad;
+
+    // Check input and target shape
+    if (input.shape.size() != 2 || target.shape.size() != 1) {
+        throw std::invalid_argument("Invalid shapes. Input should be (batch_size, num_classes) and target should be (batch_size). Got input shape:" + std::to_string(input.shape[0]) + " " + std::to_string(input.shape[1]) + " and target shape: " + std::to_string(target.shape[0]) + " instead.");
+    }
+
+    int batch_size = input.shape[0];
+    int num_classes = input.shape[1];
+
+    if (batch_size != target.shape[0]) {
+        throw std::invalid_argument("The batch size of input and target should be the same. Got batch size of input:" + std::to_string(input.shape[0]) + " and batch size of target: " + std::to_string(target.shape[0]) + " instead.");
+    }
 
     // Initialize the output tensor
     std::vector<int> output_shape = {1};
     std::vector<float> output_data(1, 0);
     Tensor output(output_shape, output_data, output_require_grad);
-    
+
     // Perform the CrossEntropy operation
-    for (int i = 0; i < x.numel(); i++) {
-        output.data[0] += -target.data[i] * std::log(x.data[i]);
+    for (int i = 0; i < batch_size; ++i) {
+        float max_logit = -std::numeric_limits<float>::infinity();
+        for (int j = 0; j < num_classes; ++j) {
+            if (input.data[i * num_classes + j] > max_logit) {
+                max_logit = input.data[i * num_classes + j];
+            }
+        }
+
+        float sum_exp = 0.0;
+        for (int j = 0; j < num_classes; ++j) {
+            sum_exp += std::exp(input.data[i * num_classes + j] - max_logit);
+        }
+
+        int target_index = static_cast<int>(target.data[i]);
+        output.data[0] += -input.data[i * num_classes + target_index] + max_logit + std::log(sum_exp);
     }
+
+    // Average the loss over the batch size
+    output.data[0] /= batch_size;
+
     // Set the grad_fn name
     this->grad_fn = "CrossEntropy_backward";
     return output;
+}
+
+void CrossEntropy::backward(const Tensor& grad_output) {
+    int batch_size = input.shape[0];
+    int num_classes = input.shape[1];
+
+    // Init input gradients
+    input.grad = std::vector<float>(input.numel(), 0);
+    for (int i = 0; i < batch_size; ++i) {
+        int target_index = static_cast<int>(target.data[i]);
+        for (int j = 0; j < num_classes; ++j) {
+            float softmax_output = std::exp(input.data[i * num_classes + j]) / 
+                                    std::accumulate(input.data.begin() + i * num_classes, input.data.begin() + (i + 1) * num_classes, 0.0f, 
+                                        [](float sum, float val) { return sum + std::exp(val); });
+
+            if (j == target_index) {
+                input.grad[i * num_classes + j] += (softmax_output - 1) * grad_output.data[0] / batch_size;
+            } else {
+                input.grad[i * num_classes + j] += softmax_output * grad_output.data[0] / batch_size;
+            }
+        }
+    }
 }
