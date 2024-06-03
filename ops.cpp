@@ -66,8 +66,6 @@ Tensor Linear::forward(const Tensor& x) {
 
 // Implement the backward pass of the Linear layer
 void Linear::backward(const Tensor& grad_output) {
-    // Check the shape of grad_output
-    std::cout << "grad_output shape: " << grad_output.shape[0] << " " << grad_output.shape[1] << std::endl;
     if (grad_output.shape[1] != weights.shape[1]) {
         throw std::invalid_argument("The number of output features should be equal to the number of weights. Got out features:" + std::to_string(grad_output.shape[1]) + " and number of weights: " + std::to_string(weights.shape[1]) + " instead.");
     }
@@ -186,4 +184,24 @@ void ReLU::backward(const Tensor& grad_output) {
             input.grad[i] = grad_output.data[i] * (input.data[i] > 0);
         }
     }
+}
+
+Tensor CrossEntropy::forward(const Tensor& x, const Tensor& target) {
+    // Set the input tensor when the forward pass is called for later grad computation
+    this->input = x;
+    this->target = target;
+    bool output_require_grad = x.require_grad;
+
+    // Initialize the output tensor
+    std::vector<int> output_shape = {1};
+    std::vector<float> output_data(1, 0);
+    Tensor output(output_shape, output_data, output_require_grad);
+    
+    // Perform the CrossEntropy operation
+    for (int i = 0; i < x.numel(); i++) {
+        output.data[0] += -target.data[i] * std::log(x.data[i]);
+    }
+    // Set the grad_fn name
+    this->grad_fn = "CrossEntropy_backward";
+    return output;
 }
