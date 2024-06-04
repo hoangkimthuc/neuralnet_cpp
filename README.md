@@ -1,4 +1,4 @@
-# Implement the entire neural net in C++.
+# Implement the entire neural net in C++ from scratch
 
 ### Things included:
 
